@@ -1,12 +1,15 @@
 #!/usr/bin/env python2
-# PyTCS.py | 2016
-# GUI for sending commands to multiple consoles/terminals
+# PyCS.py | Richard Nedbalek 2016
+# pyqt gui for sending commands to multiple consoles/terminals
 # inspired by windows putty command sender
 
 import sys
 import subprocess
-import time
 from PyQt4 import QtGui, QtCore
+
+# TODO regex this!
+tinfo="xwininfo -root -tree |grep -i XTerm |grep -vE '@wrk|VIM' |awk '{print $1,$2}'"
+terms="xwininfo -root -tree |grep -i XTerm |grep -vE '@wrk|VIM' |awk '{print $1}'"
 
 class handling():
     def __init__(self):
@@ -25,57 +28,52 @@ class handling():
             stderr=subprocess.PIPE,
             shell=True)
             out=p.communicate()
+            return(out)
 
-    def f_listWindows(self):
-        wlist_cmd="xwininfo -root -tree |grep -i XTerm |grep -vE '@wrk|VIM' |awk '{print $1,$2}'"
-        window_list = subprocess.Popen(wlist_cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                shell = True)
-        win_details = window_list.communicate()
-        print win_details
-
-    def f_submit(self,payload):
-        if not payload: 
-            handling().f_err("empty")
+    def f_submit(self,payload,window):
+        if not payload or not window:
+            handling().f_err("payload or window empty")
         else:
-            win_id = subprocess.Popen("xwininfo -root -tree |grep -i XTerm |grep -vE '@wrk|VIM' |awk '{print $1}'",
-                 stdout=subprocess.PIPE,
-                 stderr=subprocess.PIPE,
-                 shell=True);
-            target_windows = win_id.communicate()[0].strip().split("\n")
-            if not ''.join(target_windows):
-                pass
-            else:
-                for window in target_windows:
-                    # set_layout = "setxkbmap us"
-                    win_activate = "xdotool windowactivate %s" % (window)
-                    self.f_exec(win_activate)
-                    win_focus = "xdotool windowfocus %s" % (window)
-                    self.f_exec(win_focus)
-                    win_payload = "xdotool type '%s'" % (payload)
-                    self.f_exec(win_payload)
-                    win_enter = "xdotool key KP_Enter"
-                    self.f_exec(win_enter)
+            # set_layout = "setxkbmap us"
+            win_activate = "xdotool windowactivate %s" % (window)
+            self.f_exec(win_activate)
+            win_focus = "xdotool windowfocus %s" % (window)
+            self.f_exec(win_focus)
+            win_payload = "xdotool type '%s'" % (payload)
+            self.f_exec(win_payload)
+            win_enter = "xdotool key KP_Enter"
+            self.f_exec(win_enter)
+            print
 
 class Window(QtGui.QMainWindow):
     def __init__(self):
         super(Window, self).__init__()
         # self.setGeometry(50, 50, 500, 250)
         self.setFixedSize(500, 260)
-        self.setWindowTitle("PyCS.py | Python Command Sender")
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowTitle("PyCS.py | Python [terminal] Command Sender")
         self.f_home()
 
+    def f_prgBarInc(self,prgstep):
+        self.progress.setValue(prgstep)
+
     def f_preSend(self):
-        handling().f_submit(self.inputbox.toPlainText())
+        prgstep = 0
+        term_ids = ' '.join(handling().f_exec(terms)[0].split("\n")).split()
+        self.progress.setMaximum(len(term_ids))
+        for window in term_ids:
+            prgstep += 1
+            handling().f_submit(self.inputbox.toPlainText(),window)
+            self.f_prgBarInc(prgstep)
         self.inputbox.clear()
+        self.progress.setValue(100)
 
     def f_home(self):
         # editable textbox
         self.inputbox = QtGui.QTextEdit(self)
         self.inputbox.setGeometry(QtCore.QRect(0,40,500,205))
 
-        # button send 
+        # button: send 
         btn_send = QtGui.QPushButton("Send", self)
         # btn_send.setStyleSheet("border: solid 5px")
         btn_send.setShortcut("Ctrl+S")
@@ -90,11 +88,11 @@ class Window(QtGui.QMainWindow):
         btn_clr.resize(80,30)
         btn_clr.move(97,4)
         
-        # button: list terminals TODO
-        btn_list = QtGui.QPushButton("List terms", self)
-        btn_list.clicked.connect(lambda: handling().f_listWindows())
-        btn_list.resize(80,30)
-        btn_list.move(179,4)
+        # button: list terminals TODO maybe?
+        # btn_list = QtGui.QPushButton("List terms", self)
+        # btn_list.clicked.connect(lambda: handling().f_listWindows())
+        # btn_list.resize(80,30)
+        # btn_list.move(179,4)
 
         # button: quit
         btn_quit = QtGui.QPushButton("Quit", self)
@@ -103,10 +101,13 @@ class Window(QtGui.QMainWindow):
         btn_quit.resize(80,30)
         btn_quit.move(401,4)
 
-        # progressbar TODO
+        # progressbar
+        # TODO no text
         self.progress = QtGui.QProgressBar(self)
         # self.progress.setGeometry(2, 244, 493, 15)
+        self.progress.setTextVisible(0)
         self.progress.setGeometry(2, 248, 493, 10)
+        self.progress.setMinimum(0)
 
         # show all
         self.show()

@@ -1,8 +1,10 @@
 #!/usr/bin/env python2
 # PyCS.py | Richard Nedbalek 2016
 # pyqt gui for sending commands to multiple consoles/terminals
-# inspired by windows putty command sender
-
+# requirements: xdotool, xwininfo, pyqt
+# gotcha: you cannot send simple quotes '' for now. use double quotes "" instead
+# TODO use xlib instead of calling xdotool and xwininfo externally 
+import time
 import sys
 import subprocess
 from PyQt4 import QtGui, QtCore
@@ -58,13 +60,19 @@ class Window(QtGui.QMainWindow):
         self.progress.setValue(prgstep)
 
     def f_preSend(self):
-        prgstep = 0
         term_ids = ' '.join(handling().f_exec(terms)[0].split("\n")).split()
-        self.progress.setMaximum(len(term_ids))
+        print term_ids
+        prgstep = 0
+        if len(term_ids) > 0:
+            prgmax = len(term_ids)
+        else:
+            prgmax = 1
+        self.progress.setMaximum(prgmax)
         for window in term_ids:
             prgstep += 1
-            handling().f_submit(self.inputbox.toPlainText(),window)
             self.f_prgBarInc(prgstep)
+            handling().f_submit(self.inputbox.toPlainText(),window)
+            time.sleep(0.2)
         self.inputbox.clear()
         self.progress.setValue(100)
 
@@ -75,7 +83,6 @@ class Window(QtGui.QMainWindow):
 
         # button: send 
         btn_send = QtGui.QPushButton("Send", self)
-        # btn_send.setStyleSheet("border: solid 5px")
         btn_send.setShortcut("Ctrl+S")
         btn_send.clicked.connect(self.f_preSend)
         btn_send.resize(80,30)
@@ -101,8 +108,7 @@ class Window(QtGui.QMainWindow):
         btn_quit.resize(80,30)
         btn_quit.move(401,4)
 
-        # progressbar
-        # TODO no text
+        # draw progressbar
         self.progress = QtGui.QProgressBar(self)
         # self.progress.setGeometry(2, 244, 493, 15)
         self.progress.setTextVisible(0)

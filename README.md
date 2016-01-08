@@ -20,6 +20,8 @@ pyqt4	 ( debian: # aptitude install python-qt4 )
 
 you cannot send simple quotes ' ' for now. use double quotes " " instead
 
-
+<b> Ø todo </b>
+* get rid of xdotool/xwinfo and use xlib
+* history of sent data
 
 

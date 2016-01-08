@@ -6,14 +6,16 @@ A Python/Qt4 GUI tool for sending data { mostly commands; short strings } to mul
 
 
 # keyboard shortcuts
-CTRL + S	Send commands
-CTRL + C	Clear textbox
-CTRL + Q	Quit
-
+```
+Ctrl + s	Send commands
+Ctrl + c	Clear textbox
+Ctrl + q	Quit
+```
 # requirements
+```
 xdotool  ( debian: # aptitude install xdotool )
 xwininfo ( debian: # aptitude install x11-utils )
 pyqt4	 ( debian: # aptitude install python-qt4 )
-
+```
 # gotchas
 you cannot send simple quotes '' for now. use double quotes "" instead

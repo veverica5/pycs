@@ -1,7 +1,7 @@
 # PyCS - Python Command Sender
 A Python/Qt4 GUI tool for sending data { mostly commands & short strings } to multiple terminal windows at once
 
-![vid](http://ra.0x.no/pub/pycs.gif)
+![pycs-gif](http://im2.ezgif.com/tmp/ezgif-2410367743.gif)
 
 
 <b> :: keyboard shortcuts</b>
@@ -19,3 +19,7 @@ pyqt4	 ( debian: # aptitude install python-qt4 )
 <b> :: gotchas </b>
 
 you cannot send simple quotes ' ' for now. use double quotes " " instead
+
+
+
+

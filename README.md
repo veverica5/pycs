@@ -1,22 +1,22 @@
 # PyCS - Python Command Sender
 A Python/Qt4 GUI tool for sending data { mostly commands & short strings } to multiple terminal windows at once
 
-![pycs-gif](http://im2.ezgif.com/tmp/ezgif-2410367743.gif)
+![pcs](http://i.imgur.com/zCvXyK1.gifv)
 
 
-<b> :: keyboard shortcuts</b>
+<b> Ø keyboard shortcuts</b>
 ```
 Ctrl + s	Send commands
 Ctrl + c	Clear textbox
 Ctrl + q	Quit
 ```
-<b> :: requirements </b>
+<b> Ø requirements </b>
 ```
 xdotool  ( debian: # aptitude install xdotool )
 xwininfo ( debian: # aptitude install x11-utils )
 pyqt4	 ( debian: # aptitude install python-qt4 )
 ```
-<b> :: gotchas </b>
+<b> Ø gotchas </b>
 
 you cannot send simple quotes ' ' for now. use double quotes " " instead
 

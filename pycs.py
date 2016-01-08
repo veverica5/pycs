@@ -14,12 +14,20 @@ tinfo="xwininfo -root -tree |grep -i XTerm |grep -vE '@wrk|VIM' |awk '{print $1,
 terms="xwininfo -root -tree |grep -i XTerm |grep -vE '@wrk|VIM' |awk '{print $1}'"
 
 class handling():
+
+
     def __init__(self):
-        "self"
+        self.color_green = '\033[92m'
+        self.color_red = '\033[91m'
+        self.bold = '\033[1m'
+        self.color_end = '\033[0m'
+
     def f_err(self,text):
-        print "err: %s" % text
+        print self.color_red+self.bold+"[err]"+self.color_end+" %s" % text
+
     def f_ok(self,text):
-        print "ok: %s" % text
+        print self.color_green+self.bold+"[ok]"+self.color_end+"%s" % text
+
     def f_inf(self,text):
         print "inf: %s" % text
     def f_exec(self,cmd):
@@ -48,6 +56,8 @@ class handling():
             print
 
 class Window(QtGui.QMainWindow):
+
+
     def __init__(self):
         super(Window, self).__init__()
         # self.setGeometry(50, 50, 500, 250)

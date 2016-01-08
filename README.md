@@ -1,7 +1,7 @@
 # PyCS - Python Command Sender
 A Python/Qt4 GUI tool for sending data { mostly commands & short strings } to multiple terminal windows at once
 
-![vid](https://u.pomf.is/fiugzr.webm)
+![vid](http://ra.0x.no/pub/pycs.gif)
 
 
 <b> :: keyboard shortcuts</b>

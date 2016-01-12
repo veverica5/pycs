@@ -4,7 +4,7 @@
 # requirements: xdotool, xwininfo, pyqt
 # gotcha: you cannot send simple quotes '' for now.
 # use double quotes "" instead
-# TODO use xlib instead of calling xdotool and xwininfo externally
+# TODO use xlib instead of xdotool and xwininfo externally
 
 import time
 import sys

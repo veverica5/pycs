@@ -1,27 +1,19 @@
 # PyCS - Python Command Sender
-A Python/Qt4 GUI tool for sending data { mostly commands & short strings } to multiple terminal windows at once
+A Python3/Qt4 GUI tool for sending commands/strings to multiple windows at once. You are not limited to terminals, although this is undeniably primary focus of PyCS. Use `xwininfo -root -tree -all` to find the name of your app & edit `termapp` variable at top of the script to your liking.
 
 ![pcs](http://i.imgur.com/zCvXyK1.gif)
 
+##### Ø keyboard shortcuts
 
-<b> Ø keyboard shortcuts</b>
-```
-Ctrl + s	Send commands
-Ctrl + c	Clear textbox
-Ctrl + q	Quit
-```
-<b> Ø requirements </b>
-```
-xdotool  ( debian: # aptitude install xdotool )
-xwininfo ( debian: # aptitude install x11-utils )
-pyqt4	 ( debian: # aptitude install python-qt4 )
-```
-<b> Ø gotchas </b>
+* Ctrl + s  | Send commands
+* Ctrl + r  | Clear textbox
+* Ctrl + q  | Quit
 
-you cannot send simple quotes ' ' for now. use double quotes " " instead
+##### Ø requirements 
+* pyqt4	 { debian: # aptitude install python-qt4 }
+* pyautogui { # pip3 install pyautogui}
+* ewmh { # pip3 install ewmh}
 
-<b> Ø todo </b>
-* get rid of xdotool/xwinfo and use xlib
+#####  Ø todo
 * history of sent data dropdown menu
-
-
+* ctrl-c, ctrl-d buttons

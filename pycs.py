@@ -1,67 +1,53 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # PyCS.py | Richard Nedbalek 2016
 # pyqt gui for sending commands to multiple consoles/terminals
-# requirements: xdotool, xwininfo, pyqt
-# gotcha: you cannot send simple quotes '' for now.
-# use double quotes "" instead
-# TODO use xlib instead of xdotool and xwininfo externally
+# requirements: pyqt4 pyautogui ewmh
 
 import time
 import sys
-import subprocess
 from PyQt4 import QtGui, QtCore
+import ewmh
+from pyautogui import typewrite as pya
+from pyautogui import hotkey as hotkey
 
-# TODO regex this!
-tinfo = "xwininfo -root -tree |grep -i XTerm |grep -vE '@wrk|VIM' |awk '{print $1,$2}'"
-terms = "xwininfo -root -tree |grep -i XTerm |grep -vE '@wrk|VIM' |awk '{print $1}'"
+##  what terminals/windows will we look for?
+#   we can output to any window that accepts text input
+#   most common terminals are listed below, just uncomment the one that you use
+#   if your terminal is not listed below, use xwininfo -root -tree -all to determine the app name 
 
+termapp = "Gnome-terminal"
+# termapp = "Mate-terminal"
+# termapp = "XTerm"
 
-class handling():
-
+class Tools(object):
+    """Helper functions definition"""
+	
     def __init__(self):
-        self.color_green = '\033[92m'
-        self.color_red = '\033[91m'
-        self.bold = '\033[1m'
-        self.color_end = '\033[0m'
+        pass
 
-    def f_err(self, text):
-        print self.color_red+self.bold+"[err]"+self.color_end+" %s" % text
+    def getTermWindows():
+        """Returns window objects which satisfy criterion defined in _termapp_ variable"""
+        wlist = []
+        windows = ew.getClientList()
+        for window in windows:
+            if termapp in window.get_wm_class():
+                wlist.append(window)
+        return(wlist)
 
-    def f_ok(self, text):
-        print self.color_green+self.bold+"[ok]"+self.color_end+"%s" % text
-
-    def f_inf(self, text):
-        print "inf: %s" % text
-
-    def f_exec(self, cmd):
-
-            # execute cmd
-            print cmd
-            p = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                shell=True)
-            out = p.communicate()
-            return(out)
-
-    def f_submit(self, payload, window):
+    def submitPayload(self, payload, window):
+        """fn sends qt textbox defined _payload_ to a target _window_"""
+		
+        print(window, payload)
         if not payload or not window:
-            handling().f_err("payload or window empty")
+            print("err: payload or window empty")
         else:
-            # set_layout = "setxkbmap us"
-            win_activate = "xdotool windowactivate %s" % (window)
-            self.f_exec(win_activate)
-            win_focus = "xdotool windowfocus %s" % (window)
-            self.f_exec(win_focus)
-            win_payload = "xdotool type '%s'" % (payload)
-            self.f_exec(win_payload)
-            win_enter = "xdotool key KP_Enter"
-            self.f_exec(win_enter)
-            print
-
+            ew.setActiveWindow(window)
+            ew.display.flush()
+            time.sleep(0.1)
+            pya(payload)
 
 class Window(QtGui.QMainWindow):
+    """qt window parameters definition"""
 
     def __init__(self):
         super(Window, self).__init__()
@@ -69,29 +55,30 @@ class Window(QtGui.QMainWindow):
         self.setFixedSize(500, 260)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowTitle("PyCS.py | Python [terminal] Command Sender")
-        self.f_home()
+        self.home()
 
-    def f_prgBarInc(self, prgstep):
-        self.progress.setValue(prgstep)
+    def f_prgBarInc(self, current_prgbar_value):
+        """progressbar step fn """
+        self.progress.setValue(current_prgbar_value)
 
     def f_preSend(self):
-        term_ids = ' '.join(handling().f_exec(terms)[0].split("\n")).split()
-        print term_ids
-        prgstep = 0
-        if len(term_ids) > 0:
-            prgmax = len(term_ids)
+        windows = Tools.getTermWindows()
+        current_prgbar_value = 0
+        if len(windows) > 0:
+            prgmax = len(windows)
         else:
             prgmax = 1
         self.progress.setMaximum(prgmax)
-        for window in term_ids:
-            prgstep += 1
-            self.f_prgBarInc(prgstep)
-            handling().f_submit(self.inputbox.toPlainText(), window)
-            # time.sleep(0. 2)
+        for window in windows:
+            current_prgbar_value += 1
+            self.f_prgBarInc(current_prgbar_value)
+            # h = Tools()
+            Tools().submitPayload(self.inputbox.toPlainText(), window)
         self.inputbox.clear()
         self.progress.setValue(100)
 
-    def f_home(self):
+    def home(self):
+        """fn defines homescreen buttons & progressbar size/position/text/shortcut"""
         # editable textbox
         self.inputbox = QtGui.QTextEdit(self)
         self.inputbox.setGeometry(QtCore.QRect(0, 40, 500, 205))
@@ -110,12 +97,6 @@ class Window(QtGui.QMainWindow):
         btn_clr.resize(80, 30)
         btn_clr.move(97, 4)
 
-        # button: list terminals TODO maybe?
-        # btn_list = QtGui.QPushButton("List terms", self)
-        # btn_list.clicked.connect(lambda: handling().f_listWindows())
-        # btn_list.resize(80,30)
-        # btn_list.move(179,4)
-
         # button: quit
         btn_quit = QtGui.QPushButton("Quit", self)
         btn_quit.setShortcut("Ctrl+Q")
@@ -125,6 +106,7 @@ class Window(QtGui.QMainWindow):
 
         # draw progressbar
         self.progress = QtGui.QProgressBar(self)
+        
         # self.progress.setGeometry(2, 244, 493, 15)
         self.progress.setTextVisible(0)
         self.progress.setGeometry(2, 248, 493, 10)
@@ -133,11 +115,15 @@ class Window(QtGui.QMainWindow):
         # show all
         self.show()
 
-
 def run():
+    global ew
+    ew = ewmh.EWMH()
     app = QtGui.QApplication(sys.argv)
     GUI = Window()
     sys.exit(app.exec_())
 
 run()
+
+    
+        
 

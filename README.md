@@ -18,6 +18,6 @@ A Python3/Qt4 GUI tool for sending commands/strings to multiple windows at once.
 * history of sent data dropdown menu
 * ctrl-c, ctrl-d buttons
 
-##### download packages
+##### Ø download packages
 
 [debian](http://ra.0x.no/pycs/pycs-0.9.deb)

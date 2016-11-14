@@ -8,16 +8,15 @@ import sys
 from PyQt4 import QtGui, QtCore
 import ewmh
 from pyautogui import typewrite as pya
-from pyautogui import hotkey as hotkey
 
-##  what terminals/windows will we look for?
-#   we can output to any window that accepts text input
-#   most common terminals are listed below, just uncomment the one that you use
-#   if your terminal is not listed below, use xwininfo -root -tree -all to determine the app name 
+'''
+    termapp is a space delimited list of terminals 
+    that gets autodetected for input. we can write to any window 
+    that accepts text input, if your terminal/app is not listed, 
+    use xwininfo -root -tree -all to determine the app name to add.
+'''
+termapp = "Gnome-terminal Mate-terminal XTerm".split()
 
-termapp = "Gnome-terminal"
-# termapp = "Mate-terminal"
-# termapp = "XTerm"
 
 class Tools(object):
     """Helper functions definition"""
@@ -30,7 +29,7 @@ class Tools(object):
         wlist = []
         windows = ew.getClientList()
         for window in windows:
-            if termapp in window.get_wm_class():
+            if set(termapp) & set(window.get_wm_class()):
                 wlist.append(window)
         return(wlist)
 
@@ -116,6 +115,7 @@ class Window(QtGui.QMainWindow):
         self.show()
 
 def run():
+    """fn to bootstrap the gui """
     global ew
     ew = ewmh.EWMH()
     app = QtGui.QApplication(sys.argv)
@@ -126,4 +126,3 @@ run()
 
     
         
-

@@ -12,9 +12,8 @@ download here : [debian/ubuntu](http://ra.0x.no/pycs/pycs-0.9.deb)
 * Ctrl + q  | Quit
 
 ##### Ø requirements 
-* pyqt4	 { debian: # aptitude install python-qt4 }
-* pyautogui { # pip3 install pyautogui}
-* ewmh { # pip3 install ewmh}
+* python3 pyqt4 pil xlib tkinter	 { debian: # aptitude install python3 python3-qt4 python3-pil python3-xlib python3-tk }
+* pyautogui, ewmh { # pip3 install pyautogui ewmh --user}
 
 #####  Ø todo
 * history of sent data dropdown menu
